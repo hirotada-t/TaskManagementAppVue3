@@ -1,19 +1,24 @@
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
+
   const startConfig = ref(false);
+  const router = useRouter();
+  const input = ref < HTMLInputElement > (null);
 
   const btnclick = () => {
-    this.$refs.input.click();
+    input.value.click();
   }
   const fileHandle = async () => {
-    const file = this.$refs.input.files[0];
+    const file = input.value.files[0];
     if (!file) {
       return;
     }
     let reader = new FileReader();
     reader.readAsText(file);
     reader.onload = () => {
-      this.$router.push({
+      console.log(111)
+      router.push({
         name: 'TaskPage',
         params: { taskList: JSON.parse(reader.result) }
       });
