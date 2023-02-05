@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useQuasar } from 'quasar'
+  import { paths } from '../router/routes.ts';
+  import { useQuasar } from 'quasar';
 
   const startConfig = ref(false);
   const router = useRouter();
@@ -19,9 +20,9 @@
     let reader = new FileReader();
     reader.readAsText(file);
     reader.onload = () => {
-      const tasks = reader.result;
+      const task = reader.result;
       try {
-        JSON.parse(tasks);
+        JSON.parse(task);
       } catch (e) {
         $q.notify({
           color: 'negative',
@@ -33,8 +34,8 @@
         });
         return;
       }
-      localStorage.setItem('tasks', tasks);
-      router.push('task');
+      localStorage.setItem('task', task);
+      router.push(paths.task);
     };
   }
 </script>
@@ -55,7 +56,7 @@
         </q-card-section>
         <q-card-section>
           <q-btn label="start anew" icon="open_in_new" size="20px" color="primary" class="q-mt-md full-width"
-            to="/task" />
+            to="/create" />
           <q-btn label="open json data" icon="file_upload" size="20px" color="primary" class="q-mt-md full-width"
             @click="btnclick" />
           <input type="file" class="hidden" ref="input" accept="application/json" @change="fileHandle" />
