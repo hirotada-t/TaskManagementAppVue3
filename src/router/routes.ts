@@ -12,8 +12,6 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'task',
         component: () => import('src/pages/TaskPage.vue'),
-        props: true,
-        name: 'TaskPage',
       },
     ],
   },

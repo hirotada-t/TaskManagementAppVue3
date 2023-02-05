@@ -1,9 +1,11 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { useQuasar } from 'quasar'
 
   const startConfig = ref(false);
   const router = useRouter();
+  const $q = useQuasar()
   const input = ref < HTMLInputElement > (null);
 
   const btnclick = () => {
@@ -17,11 +19,22 @@
     let reader = new FileReader();
     reader.readAsText(file);
     reader.onload = () => {
-      console.log(111)
-      router.push({
-        name: 'TaskPage',
-        params: { taskList: JSON.parse(reader.result) }
-      });
+      const tasks = reader.result;
+      try {
+        JSON.parse(tasks);
+      } catch (e) {
+        $q.notify({
+          color: 'negative',
+          multiLine: true,
+          message: 'Illegal file. Please select another file.',
+          position: 'bottom',
+          icon: 'warning',
+          timeout: 3000
+        });
+        return;
+      }
+      localStorage.setItem('tasks', tasks);
+      router.push('task');
     };
   }
 </script>

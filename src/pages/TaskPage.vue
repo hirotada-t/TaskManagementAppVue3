@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  const tasks = JSON.parse(localStorage.getItem("tasks"));
+  console.log(tasks)
 </script>
 
 <template>
