@@ -66,7 +66,7 @@ const fileHandle = async () => {
             size="20px"
             color="primary"
             class="q-mt-md full-width"
-            to="/create"
+            :to="paths.task"
           />
           <q-btn
             label="open json data"
