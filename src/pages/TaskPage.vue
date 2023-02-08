@@ -1,5 +1,6 @@
 <script setup lang='ts'>
   import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue';
+  import { onBeforeRouteLeave } from 'vue-router';
   import TaskColumn from '../components/TaskColumn.vue';
   // import ArchiveItem from '../components/ArchiveItem.vue';
   import ScrollBooster from 'scrollbooster';
@@ -142,10 +143,14 @@
       }
     }
   });
-  onBeforeUnmount(() => {
-    // alert('aa')
-  })
-
+  onBeforeRouteLeave((to, from, next) => {
+    const answer = window.confirm('保存していないデータは失われます。よろしいですか？');
+    if (answer) {
+      next();
+    } else {
+      next(false);
+    }
+  });
 </script>
 
 <template>
@@ -277,6 +282,7 @@
 
   .task-container {
     height: calc(100vh - 72px);
+
     @media screen and (min-width:1024px) {
       height: calc(100vh - 65px);
     }
