@@ -1,20 +1,30 @@
 <script setup lang='ts'>
-  import { onMounted, ref, nextTick } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue';
   import TaskColumn from '../components/TaskColumn.vue';
   // import ArchiveItem from '../components/ArchiveItem.vue';
   import ScrollBooster from 'scrollbooster';
 
+  const ic = {
+    zoom: {
+      in: 'zoom_in',
+      out: 'zoom_out'
+    },
+    filter: {
+      on: 'filter_alt',
+      off: 'filter_alt_off'
+    }
+  }
   let data = [];
   if (localStorage.getItem('task')) data = JSON.parse(localStorage.getItem('task'));
-  const taskList = ref(data);
 
+  const taskList = ref(data);
   const rightDrawerOpen = ref(false);
   const newSectionInput = ref(false);
   const sb = ref(null);
   const newSection = ref('');
-  const scaleIcon = 'zoom_in'
+  const filtered = ref(false);
+  const scaled = ref(false);
   const taskListTitle = ''
-  const filtered = false
   const archiveList = [];
 
   const addSectionInput = () => {
@@ -73,11 +83,9 @@
     const content = document.querySelector('.content');
     if (content.classList.contains('zoom-out')) {
       content.classList.remove('zoom-out');
-      this.scaleIcon = 'zoom_out';
     } else {
       content.classList.add('zoom-out');
       content.style.width = window.screen.width + 'px';
-      this.scaleIcon = 'zoom_in';
     }
   }
   const addArchiveList = (e) => {
@@ -106,12 +114,12 @@
       });
     }
 
-    const taskListTitle = document.querySelector('.task-list-title');
-    taskListTitle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.saveData();
-      }
-    });
+    // const taskListTitle = document.querySelector('.task-list-title');
+    // taskListTitle.addEventListener('keydown', (e) => {
+    //   if (e.key === 'Enter') {
+    //     this.saveData();
+    //   }
+    // });
 
     if (typeof taskList.value === 'undefined') return;
     if (taskList.value.length > 0) {
@@ -134,6 +142,10 @@
       }
     }
   });
+  onBeforeUnmount(() => {
+    // alert('aa')
+  })
+
 </script>
 
 <template>
@@ -143,7 +155,7 @@
         <div class="col-1">
           <q-btn icon="keyboard_return" class="full-width bg-grey-4" label="back" size="15px" to="/" />
         </div>
-        <div class="col-3 task-list-title">
+        <!-- <div class="col-3 task-list-title">
           <q-input dense outlined bg-color="grey-2" v-model="taskListTitle" placeholder="taskListTitle"
             class="full-width" style="font-size: 25px;">
             <template v-slot:append>
@@ -151,13 +163,13 @@
               <q-icon v-else name="clear" class="cursor-pointer" @click="taskListTitle = ''" />
             </template>
           </q-input>
-        </div>
+        </div> -->
         <div class="col-2">
           <q-btn label="save" class="full-width bg-deep-orange-3" @click="saveData" size="15px" icon="save_alt" />
         </div>
         <div class="col-2">
           <q-btn :label="filtered ? 'filtered' : 'unfiltered'" class="full-width bg-light-blue-3"
-            @click="filtered = !filtered" size="15px" :icon="rmvUncleared">
+            @click="filtered = !filtered" size="15px" :icon="filtered? ic.filter.on: ic.filter.off">
             <q-tooltip>
               Remove uncleared
             </q-tooltip>
@@ -236,19 +248,18 @@
           </div>
         </div>
       </div>
-      <q-input dense outlined bg-color="grey-2" v-model="taskListTitle" placeholder="taskListTitle"
-        class="full-width mobile-only" style="font-size: 20px;" />
     </div>
 
-    <q-footer elevated class="bg-blue-grey-9 text-white mobile-only">
+    <footer class="absolute-bottom bg-blue-grey-9 text-white mobile-only">
       <q-tabs align="justify">
-        <q-route-tab dense icon="keyboard_return" to="/#" exact />
-        <q-tab dense icon="save_alt" @click="saveData" />
-        <q-tab dense :icon="scaleIcon" @click="scaleCardArea" />
-        <q-tab dense :icon="rmvUncleared" @click="filtered = !filtered" />
-        <q-tab dense icon="menu" @click="rightDrawerOpen = !rightDrawerOpen" />
+        <q-route-tab label="" dense icon="keyboard_return" to="/#" exact />
+        <q-tab label="save" dense icon="save_alt" @click="saveData" />
+        <q-tab label="zoom" dense :icon="scaled? ic.zoom.in: ic.zoom.out" @click="
+        scaled = !scaled;scaleCardArea()" />
+        <q-tab label="filter" dense :icon="filtered? ic.filter.on: ic.filter.off" @click="filtered = !filtered" />
+        <q-tab label="menu" dense icon="menu" @click="rightDrawerOpen = !rightDrawerOpen" />
       </q-tabs>
-    </q-footer>
+    </footer>
 
   </q-page>
 </template>
@@ -265,11 +276,10 @@
   }
 
   .task-container {
+    height: calc(100vh - 72px);
     @media screen and (min-width:1024px) {
       height: calc(100vh - 65px);
     }
-
-    height: calc(100vh - 100px);
   }
 
   .w-300px {
