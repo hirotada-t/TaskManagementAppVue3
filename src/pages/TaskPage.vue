@@ -149,7 +149,7 @@ onMounted(() => {
 });
 onBeforeRouteLeave((to, from, next) => {
   const answer = window.confirm(
-    '保存していないデータは失われます。よろしいですか？'
+    'Any unsaved data will be lost. Are you sure?'
   );
   if (answer) {
     next();
