@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { paths } from '../router/routes.ts';
 import { useQuasar } from 'quasar';
 
-const startConfig = ref(false);
+const startConfig = ref<boolean>(false);
 const router = useRouter();
 const $q = useQuasar();
 const input = ref<HTMLInputElement>(null);
