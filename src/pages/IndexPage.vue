@@ -3,8 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { paths } from '../router/routes';
 import { useQuasar } from 'quasar';
-import { ValidData } from './models';
-import { type } from 'os';
+// import { ValidData } from './models';
 
 const startConfig = ref<boolean>(false);
 const router = useRouter();

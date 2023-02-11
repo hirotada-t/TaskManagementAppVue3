@@ -4,6 +4,8 @@ import { onBeforeRouteLeave } from 'vue-router';
 import TaskColumn from '../components/TaskColumn.vue';
 // import ArchiveItem from '../components/ArchiveItem.vue';
 import ScrollBooster from 'scrollbooster';
+import { ValidData } from './models';
+import { exportFile, useQuasar } from 'quasar'
 
 const ic = {
   zoom: {
@@ -15,12 +17,13 @@ const ic = {
     off: 'filter_alt_off',
   },
 };
-let data = [];
-if (localStorage.getItem('task'))
-  data = JSON.parse(localStorage.getItem('task'));
+const strItem = localStorage.getItem('task');
+let data: ValidData[] = [];
+if (strItem) data = JSON.parse(strItem);
 let sb: ScrollBooster;
+const $q = useQuasar();
 
-const taskList = ref<[]>(data);
+const taskList = ref<ValidData[]>(data);
 const rightDrawerOpen = ref<boolean>(false);
 const newSectionInput = ref<boolean>(false);
 const sectionName = ref<string>('');
@@ -32,12 +35,12 @@ const archiveList = ref<[]>([]);
 const addSectionInput = () => {
   newSectionInput.value = !newSectionInput.value;
   nextTick(() => {
-    const newSect = document.querySelector('.new-section input');
-    newSect.focus();
+    const newSect = document.querySelector(
+      '.new-section input'
+    ) as HTMLInputElement;
+    if (newSect) newSect.focus();
     newSect.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.addSection();
-      }
+      if (e.key === 'Enter') addSection();
     });
   });
   if (window.matchMedia('(min-width: 1024px)').matches) {
@@ -62,23 +65,22 @@ const updateScrollBooster = () => {
 };
 const saveData = async () => {
   const date = new Date();
-  const options = {
-    suggestedName: taskListTitle ? taskListTitle : date.toLocaleString(),
-    types: [
-      {
-        description: 'JSON file',
-        accept: { 'application/json': ['.json'] },
-      },
-    ],
-  };
-  try {
-    const handle = await window.showSaveFilePicker(options);
-    const writable = await handle.createWritable();
-    await writable.write(JSON.stringify(taskList.value));
-    await writable.close();
-  } catch (e) {
-    alert('保存をキャンセルしました。');
+  const content = JSON.stringify(taskList.value);
+  const status = exportFile(
+    date.toLocaleString() + '.json',
+    content,
+    'application/json'
+  );
+  if (!status) {
+    $q.notify({
+      message: 'Browser denied file download...',
+      color: 'negative',
+      icon: 'warning',
+    });
   }
+  // const options = {
+  //   suggestedName: /*taskListTitle ? taskListTitle :*/ date.toLocaleString(),
+  // };
 };
 // const confirmSave = (e) => {
 //   e.returnValue = '';
@@ -184,9 +186,9 @@ onBeforeRouteLeave((to, from, next) => {
           <q-btn
             label="save"
             class="full-width bg-deep-orange-3"
-            @click="saveData"
             size="15px"
             icon="save_alt"
+            @click="saveData"
           />
         </div>
         <div class="col-2">
