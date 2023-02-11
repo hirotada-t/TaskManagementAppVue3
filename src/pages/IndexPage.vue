@@ -1,42 +1,43 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { paths } from '../router/routes.ts';
+import { paths } from '../router/routes';
 import { useQuasar } from 'quasar';
+// import { ValidData } from './models';
 
 const startConfig = ref<boolean>(false);
 const router = useRouter();
 const $q = useQuasar();
-const input = ref<HTMLInputElement>(null);
+const input = ref<HTMLInputElement>();
 
 const btnclick = () => {
-  input.value.click();
+  if (typeof input.value != 'undefined') input.value.click();
 };
-const fileHandle = async () => {
-  const file = input.value.files[0];
-  if (!file) {
+const fileHandle = async (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const file = (target.files as FileList)[0];
+  if (!file || file.name.slice(-4).toLowerCase() != 'json') {
+    alertWindow();
     return;
   }
+
   let reader = new FileReader();
   reader.readAsText(file);
   reader.onload = () => {
-    const task = reader.result;
-    try {
-      JSON.parse(task);
-    } catch (e) {
-      $q.notify({
-        color: 'negative',
-        multiLine: true,
-        message: 'Illegal file. Please select another file.',
-        position: 'bottom',
-        icon: 'warning',
-        timeout: 3000,
-      });
-      return;
-    }
+    const task = reader.result as string;
     localStorage.setItem('task', task);
     router.push(paths.task);
   };
+};
+const alertWindow = () => {
+  $q.notify({
+    color: 'negative',
+    multiLine: true,
+    message: 'Illegal file. Please select another.',
+    position: 'bottom',
+    icon: 'warning',
+    timeout: 3000,
+  });
 };
 </script>
 

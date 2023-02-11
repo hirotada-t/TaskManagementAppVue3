@@ -1,33 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 // import TaskItem from './TaskItem.vue';
+import { TaskList, ArchiveCard } from '../models';
 import { useQuasar } from 'quasar';
 
-const props = defineProps({ section: Object, filter: Boolean });
+const props = defineProps<{ section: TaskList; filter: boolean }>();
 const emits = defineEmits(['add-archive-list']);
-const getSection = ref<object>(props.section);
+const getSection = ref<TaskList>(props.section);
 const newCard = ref<string>('');
 const newCardInput = ref<boolean>(false);
 const $q = useQuasar();
 
 const addSectionInput = () => {
-  this.newCardInput = !this.newCardInput;
-  this.$nextTick(() => {
-    const newSection = document.querySelector('.new-card input');
+  newCardInput.value = !newCardInput.value;
+  nextTick(() => {
+    const newSection = document.querySelector(
+      '.new-card input'
+    ) as HTMLInputElement;
     newSection.focus();
     newSection.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.addCard();
-      }
+      if (e.key === 'Enter') addCard();
     });
   });
 };
 const addCard = () => {
-  this.newCardInput = !this.newCardInput;
+  newCardInput.value = !newCardInput.value;
   const date = new Date();
   getSection.value.cardList.push({
     cardId: 'c-' + date.toLocaleString() + date.getMilliseconds(),
-    cardName: this.newCard ? this.newCard : 'Card title',
+    cardName: newCard.value ? newCard.value : 'Card title',
     // 'cardContent': 'content',
     // 'createDate': date.toLocaleString(),
     // 'deadLine': '',
@@ -39,7 +40,7 @@ const addCard = () => {
     deleted: false,
     // 'cardComment': 'comment',
   });
-  this.newCard = '';
+  newCard.value = '';
 };
 const archiveSection = () => {
   $q.dialog({
@@ -54,7 +55,7 @@ const archiveSection = () => {
     console.log(getSection.value);
     for (let i = 0; i < getSection.value.cardList.length; i++) {
       getSection.value.cardList[i].archives = true;
-      emits(['add-archive-list'], {
+      emits('add-archive-list', {
         cardId: getSection.value.cardList[i].cardId,
         cardName: getSection.value.cardList[i].cardName,
         // 'cardContent': 'content',
@@ -70,8 +71,8 @@ const archiveSection = () => {
     }
   });
 };
-const addArchive = (e) => {
-  emits(['add-archive-list'], e);
+const addArchive = (card: ArchiveCard) => {
+  emits('add-archive-list', card);
 };
 const countCards = () => {
   let counter = 0;

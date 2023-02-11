@@ -1,4 +1,107 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+import { Card } from '../models';
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
+const props = defineProps<{ card: Card; filtered: boolean }>();
+const emits = defineEmits(['add-archive']);
+
+const getCard = ref(props.card);
+const options = ['none', 'high', 'middle', 'low'];
+const getFilter = ref(props.filtered);
+
+const archiveCard = () => {
+  let message = '';
+  if (!getCard.value.checked) {
+    message = 'The task is uncompleted. Do you archive?';
+  } else {
+    message = 'Do you archive the task?';
+  }
+  $q.dialog({
+    title: 'Alert',
+    message,
+    cancel: {
+      push: true,
+      color: 'negative',
+    },
+  }).onOk(() => {
+    getCard.value.archives = true;
+    emits('add-archive', {
+      cardId: getCard.value.cardId,
+      cardName: getCard.value.cardName,
+      // "cardPosNum": this.getSection.cardList.length + 1,
+      // "cardContent": "content",
+      // "createDate": date.toLocaleString(),
+      // "deadLine": "",
+      // "checkList": {},
+      // "cardTags": [],
+      priority: getCard.value.priority,
+      checked: getCard.value.checked,
+      deleted: false,
+      // "cardComment": "comment",
+    });
+  });
+};
+watch(getFilter, (v) => {
+  getFilter.value = v;
+});
+</script>
+
+<template>
+  <q-card
+    class="gnavi my-card q-mb-md"
+    v-if="!getCard.archives"
+    v-show="getFilter && getCard.checked"
+    :class="getCard.priority"
+  >
+    <div class="cleared-border" :class="getCard.checked ? 'cleared' : ''">
+      <div>
+        <q-card-section class="q-py-none q-px-sm card-name">
+          <q-input
+            dense
+            autogrow
+            v-model="getCard.cardName"
+            class="col-11 text-h6"
+            placeholder="cardName"
+          >
+            <template v-slot:append>
+              <q-icon v-if="getCard.cardName === ''" name="edit" />
+              <q-icon
+                v-else
+                name="clear"
+                class="cursor-pointer"
+                @click="getCard.cardName = ''"
+              />
+            </template>
+          </q-input>
+          <!-- <span class="text-h6" @click="setDetails = true">{{getCard.cardName}}</span> -->
+        </q-card-section>
+        <q-card-section class="row justify-start q-py-none card-name">
+          <div class="">
+            <q-checkbox v-model="getCard.checked" color="black" />
+            <q-tooltip v-if="getCard.checked"> Cleared! </q-tooltip>
+            <q-tooltip v-if="!getCard.checked"> Not cleared </q-tooltip>
+          </div>
+          <div class="">
+            <q-btn round flat @click="archiveCard" icon="archive" />
+            <q-tooltip> Archive </q-tooltip>
+          </div>
+          <div class="col-7 q-py-sm">
+            <q-select
+              dense
+              filled
+              borderless
+              v-model="getCard.priority"
+              :options="options"
+              label="priority"
+            />
+          </div>
+        </q-card-section>
+      </div>
+    </div>
+  </q-card>
+</template>
 
 <style lang="scss" scoped>
 .my-card {
@@ -99,97 +202,3 @@
   }
 }
 </style>
-
-<template>
-  <q-card
-    class="gnavi my-card q-mb-md"
-    v-if="!getCard.archives"
-    v-show="removeUncleared"
-    :class="getCard.priority"
-  >
-    <div class="cleared-border" :class="cleared">
-      <div>
-        <q-card-section class="q-py-none q-px-sm card-name">
-          <q-input
-            dense
-            autogrow
-            v-model="getCard.cardName"
-            class="col-11 text-h6"
-            placeholder="cardName"
-          >
-            <template v-slot:append>
-              <q-icon v-if="getCard.cardName === ''" name="edit" />
-              <q-icon
-                v-else
-                name="clear"
-                class="cursor-pointer"
-                @click="getCard.cardName = ''"
-              />
-            </template>
-          </q-input>
-          <!-- <span class="text-h6" @click="setDetails = true">{{getCard.cardName}}</span> -->
-        </q-card-section>
-        <q-card-section class="row justify-start q-py-none card-name">
-          <div class="">
-            <q-checkbox v-model="getCard.checked" color="black" />
-            <q-tooltip v-if="getCard.checked"> Cleared! </q-tooltip>
-            <q-tooltip v-if="!getCard.checked"> Not cleared </q-tooltip>
-          </div>
-          <div class="">
-            <q-btn round flat @click="archiveCard" icon="archive" />
-            <q-tooltip> Archive </q-tooltip>
-          </div>
-          <div class="col-7 q-py-sm">
-            <q-select
-              dense
-              filled
-              borderless
-              v-model="getCard.priority"
-              :options="options"
-              label="priority"
-            />
-          </div>
-        </q-card-section>
-      </div>
-    </div>
-    <!-- <q-dialog v-model="setDetails">
-      <q-layout view="hhh lpr fff" container class="bg-white">
-        <q-header class="bg-blue-grey sp-none">
-          <q-toolbar>
-            <q-toolbar-title>
-              <q-input dense outlined bg-color="grey-4" v-model="getCard.cardName" label="change card title"
-                class="full-width" style="font-size: 25px;" />
-            </q-toolbar-title>
-            <q-btn dense flat round icon="menu" @click="rightDrawerOpen = !rightDrawerOpen" />
-            <q-btn flat v-close-popup round dense icon="close" />
-          </q-toolbar>
-        </q-header>
-        <q-footer class="bg-blue-grey">
-          <q-toolbar class="tb-pc-none">
-            <q-toolbar-title>
-              <q-input dense outlined bg-color="grey-4" v-model="getCard.cardName" label="change card title"
-                class="full-width" style="font-size: 25px;" />
-            </q-toolbar-title>
-            <q-btn flat v-close-popup round dense icon="close" />
-          </q-toolbar>
-        </q-footer>
-
-        <q-page-container>
-          <q-page padding>
-            <p>
-              <q-expansion-item v-model="expanded" icon="perm_identity" label="Description">
-                <q-card>
-                  <q-card-section>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos corrupti
-                    commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
-                    eveniet doloribus ullam aliquid.
-                  </q-card-section>
-                </q-card>
-              </q-expansion-item>
-            </p>
-          </q-page>
-        </q-page-container>
-      </q-layout>
-    </q-dialog> -->
-  </q-card>
-</template>

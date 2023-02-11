@@ -4,6 +4,8 @@ import { onBeforeRouteLeave } from 'vue-router';
 import TaskColumn from '../components/TaskColumn.vue';
 // import ArchiveItem from '../components/ArchiveItem.vue';
 import ScrollBooster from 'scrollbooster';
+import { TaskList, ArchiveCard } from '../models';
+import { exportFile, useQuasar } from 'quasar'
 
 const ic = {
   zoom: {
@@ -15,29 +17,30 @@ const ic = {
     off: 'filter_alt_off',
   },
 };
-let data = [];
-if (localStorage.getItem('task'))
-  data = JSON.parse(localStorage.getItem('task'));
+const strItem = localStorage.getItem('task');
+let data: TaskList[] = [];
+if (strItem) data = JSON.parse(strItem);
 let sb: ScrollBooster;
+const $q = useQuasar();
 
-const taskList = ref<[]>(data);
+const taskList = ref<TaskList[]>(data);
 const rightDrawerOpen = ref<boolean>(false);
 const newSectionInput = ref<boolean>(false);
 const sectionName = ref<string>('');
 const filtered = ref<boolean>(false);
 const scaled = ref<boolean>(false);
 // const taskListTitle = '';
-const archiveList = ref<[]>([]);
+const archiveList = ref<ArchiveCard[]>([]);
 
 const addSectionInput = () => {
   newSectionInput.value = !newSectionInput.value;
   nextTick(() => {
-    const newSect = document.querySelector('.new-section input');
-    newSect.focus();
+    const newSect = document.querySelector(
+      '.new-section input'
+    ) as HTMLInputElement;
+    if (newSect) newSect.focus();
     newSect.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.addSection();
-      }
+      if (e.key === 'Enter') addSection();
     });
   });
   if (window.matchMedia('(min-width: 1024px)').matches) {
@@ -62,29 +65,28 @@ const updateScrollBooster = () => {
 };
 const saveData = async () => {
   const date = new Date();
-  const options = {
-    suggestedName: taskListTitle ? taskListTitle : date.toLocaleString(),
-    types: [
-      {
-        description: 'JSON file',
-        accept: { 'application/json': ['.json'] },
-      },
-    ],
-  };
-  try {
-    const handle = await window.showSaveFilePicker(options);
-    const writable = await handle.createWritable();
-    await writable.write(JSON.stringify(taskList.value));
-    await writable.close();
-  } catch (e) {
-    alert('保存をキャンセルしました。');
+  const taskData = JSON.stringify(taskList.value);
+  const status = exportFile(
+    date.toLocaleString() + '.json',
+    taskData,
+    'application/json'
+  );
+  if (!status) {
+    $q.notify({
+      message: 'Browser denied file download...',
+      color: 'negative',
+      icon: 'warning',
+    });
   }
+  // const options = {
+  //   suggestedName: /*taskListTitle ? taskListTitle :*/ date.toLocaleString(),
+  // };
 };
 // const confirmSave = (e) => {
 //   e.returnValue = '';
 // }
 const scaleCardArea = () => {
-  const content = document.querySelector('.content');
+  const content = document.querySelector('.content') as HTMLElement;
   if (content.classList.contains('zoom-out')) {
     content.classList.remove('zoom-out');
   } else {
@@ -92,13 +94,13 @@ const scaleCardArea = () => {
     content.style.width = window.screen.width + 'px';
   }
 };
-const addArchiveList = (e) => {
-  archiveList.value.unshift(e);
+const addArchiveList = (card: ArchiveCard) => {
+  archiveList.value.unshift(card);
 };
-const deletedUpdate = (e) => {
+const deletedUpdate = (id: string) => {
   for (let i = 0; i < taskList.value.length; i++) {
     for (let j = 0; j < taskList.value[i].cardList.length; j++) {
-      if (taskList.value[i].cardList[j].cardId === e) {
+      if (taskList.value[i].cardList[j].cardId === id) {
         taskList.value[i].cardList[j].deleted = true;
         console.log(taskList.value);
       }
@@ -107,8 +109,8 @@ const deletedUpdate = (e) => {
 };
 
 onMounted(() => {
-  const viewport = document.querySelector('.viewport');
-  const content = document.querySelector('.content');
+  const viewport = document.querySelector('.viewport') as HTMLElement;
+  const content = document.querySelector('.content') as HTMLElement;
   if (window.matchMedia('(min-width: 1024px)').matches) {
     sb = new ScrollBooster({
       viewport,
@@ -128,7 +130,6 @@ onMounted(() => {
   if (typeof taskList.value === 'undefined') return;
   if (taskList.value.length > 0) {
     for (let i = 0; i < taskList.value.length; i++) {
-      console.log(taskList.value[i]);
 
       if (taskList.value[i].cardList.length > 0) {
         for (let j = 0; j < taskList.value[i].cardList.length; j++) {
@@ -148,7 +149,7 @@ onMounted(() => {
 });
 onBeforeRouteLeave((to, from, next) => {
   const answer = window.confirm(
-    '保存していないデータは失われます。よろしいですか？'
+    'Any unsaved data will be lost. Are you sure?'
   );
   if (answer) {
     next();
@@ -184,9 +185,9 @@ onBeforeRouteLeave((to, from, next) => {
           <q-btn
             label="save"
             class="full-width bg-deep-orange-3"
-            @click="saveData"
             size="15px"
             icon="save_alt"
+            @click="saveData"
           />
         </div>
         <div class="col-2">
