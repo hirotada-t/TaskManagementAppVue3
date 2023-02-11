@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   // import TaskItem from './TaskItem.vue';
+  import { useQuasar } from 'quasar';
 
+  const $q = useQuasar();
   const props = defineProps({ section: Object, filter: Boolean });
   const getSection = ref(props.section);
   const newCard = ref('');
@@ -22,7 +24,7 @@
   const addCard = () => {
     this.newCardInput = !this.newCardInput;
     const date = new Date();
-    this.getSection.cardList.push({
+    getSection.value.cardList.push({
       'cardId': 'c-' + date.toLocaleString() + date.getMilliseconds(),
       'cardName': this.newCard ? this.newCard : 'Card title',
       // 'cardContent': 'content',
@@ -39,7 +41,7 @@
     this.newCard = ''
   }
   const archiveSection = () => {
-    this.$q.dialog({
+    $q.dialog({
       title: 'Alert',
       message: 'All cards in the section are also archived. Are you sure??',
       cancel: {
@@ -47,19 +49,19 @@
         color: 'negative'
       }
     }).onOk(() => {
-      this.getSection.archives = true;
-      for (let i = 0; i < this.getSection.cardList.length; i++) {
-        this.getSection.cardList[i].archives = true;
+      getSection.value.archives = true;
+      for (let i = 0; i < getSection.value.cardList.length; i++) {
+        getSection.value.cardList[i].archives = true;
         this.$emit('add-archive-list', {
-          'cardId': this.getSection.cardList[i].cardId,
-          'cardName': this.getSection.cardList[i].cardName,
+          'cardId': getSection.value.cardList[i].cardId,
+          'cardName': getSection.value.cardList[i].cardName,
           // 'cardContent': 'content',
           // 'createDate': date.toLocaleString(),
           // 'deadLine': '',
           // 'checkList': {},
           // 'cardTags': [],
-          'priority': this.getSection.cardList[i].priority,
-          'checked': this.getSection.cardList[i].checked,
+          'priority': getSection.value.cardList[i].priority,
+          'checked': getSection.value.cardList[i].checked,
           'deleted': false,
           // 'cardComment': 'comment',
         });
