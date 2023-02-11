@@ -1,26 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { paths } from '../router/routes.ts';
+import { paths } from '../router/routes';
 import { useQuasar } from 'quasar';
 
 const startConfig = ref<boolean>(false);
 const router = useRouter();
 const $q = useQuasar();
-const input = ref<HTMLInputElement>(null);
+const input = ref<HTMLInputElement>();
 
 const btnclick = () => {
-  input.value.click();
+  if (typeof input.value != 'undefined') input.value.click();
 };
-const fileHandle = async () => {
-  const file = input.value.files[0];
-  if (!file) {
-    return;
-  }
+const fileHandle = async (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const file = (target.files as FileList)[0];
+  if (!file) return;
+
   let reader = new FileReader();
-  reader.readAsText(file);
   reader.onload = () => {
-    const task = reader.result;
+    const task = reader.result as string;
     try {
       JSON.parse(task);
     } catch (e) {
