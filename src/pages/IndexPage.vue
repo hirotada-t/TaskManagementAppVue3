@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { paths } from '../router/routes';
 import { useQuasar } from 'quasar';
+import {ValidData} from './models'
 
 const startConfig = ref<boolean>(false);
 const router = useRouter();
@@ -16,12 +17,13 @@ const fileHandle = async (e: Event) => {
   const target = e.target as HTMLInputElement;
   const file = (target.files as FileList)[0];
   if (!file) return;
-
   let reader = new FileReader();
+  reader.readAsText(file);
   reader.onload = () => {
     const task = reader.result as string;
     try {
-      JSON.parse(task);
+      const data:ValidData[] = JSON.parse(task);
+
     } catch (e) {
       $q.notify({
         color: 'negative',
