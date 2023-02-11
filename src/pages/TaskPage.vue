@@ -4,7 +4,7 @@ import { onBeforeRouteLeave } from 'vue-router';
 import TaskColumn from '../components/TaskColumn.vue';
 // import ArchiveItem from '../components/ArchiveItem.vue';
 import ScrollBooster from 'scrollbooster';
-import { TaskList, ArchiveCard } from './models';
+import { TaskList, ArchiveCard } from '../models';
 import { exportFile, useQuasar } from 'quasar'
 
 const ic = {

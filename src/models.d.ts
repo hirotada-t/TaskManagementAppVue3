@@ -1,5 +1,5 @@
 export interface Card extends ArchiveCard {
-  archives: false;
+  archives: boolean;
 }
 
 export interface TaskList {
