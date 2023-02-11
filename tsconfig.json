@@ -1,5 +1,6 @@
 {
   "extends": "@quasar/app-vite/tsconfig-preset",
+  "checkJs": true,
   "compilerOptions": {
     "removeComments": true,
     "baseUrl": "."

@@ -1,5 +1,5 @@
-<script setup lang='ts'>
-  import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue';
+<script setup lang="ts">
+  import { onMounted, ref, nextTick } from 'vue';
   import { onBeforeRouteLeave } from 'vue-router';
   import TaskColumn from '../components/TaskColumn.vue';
   // import ArchiveItem from '../components/ArchiveItem.vue';
@@ -8,24 +8,24 @@
   const ic = {
     zoom: {
       in: 'zoom_in',
-      out: 'zoom_out'
+      out: 'zoom_out',
     },
     filter: {
       on: 'filter_alt',
-      off: 'filter_alt_off'
-    }
-  }
-  let data = [];
-  if (localStorage.getItem('task')) data = JSON.parse(localStorage.getItem('task'));
+      off: 'filter_alt_off',
+    },
+  };
+  if (localStorage.getItem('task'))
+    data = JSON.parse(localStorage.getItem('task'));
 
-  const taskList = ref(data);
+  const taskList = ref([]);
   const rightDrawerOpen = ref(false);
   const newSectionInput = ref(false);
   const sb = ref(null);
-  const newSection = ref('');
+  const sectionName = ref('');
   const filtered = ref(false);
   const scaled = ref(false);
-  const taskListTitle = ''
+  const taskListTitle = '';
   const archiveList = [];
 
   const addSectionInput = () => {
@@ -37,36 +37,38 @@
         if (e.key === 'Enter') {
           this.addSection();
         }
-      })
+      });
     });
     if (window.matchMedia('(min-width: 1024px)').matches) {
       updateScrollBooster();
     }
-  }
+  };
   const addSection = () => {
     const date = new Date();
     newSectionInput.value = !newSectionInput.value;
     taskList.value.push({
-      'sectionId': 's-' + date.toLocaleString(),
-      'sectionName': newSection.value ? newSection.value : 'Section title',
-      'archives': false,
-      'cardList': []
+      sectionId: 's-' + date.toLocaleString(),
+      sectionName: sectionName.value ? sectionName.value : 'New section',
+      archives: false,
+      cardList: [],
     });
-    newSection.value = '';
-  }
+    sectionName.value = '';
+  };
   const updateScrollBooster = () => {
     nextTick(() => {
       sb.value.updateMetrics();
     });
-  }
+  };
   const saveData = async () => {
     const date = new Date();
     const options = {
       suggestedName: taskListTitle ? taskListTitle : date.toLocaleString(),
-      types: [{
-        description: 'JSON file',
-        accept: { 'application/json': ['.json'] },
-      }],
+      types: [
+        {
+          description: 'JSON file',
+          accept: { 'application/json': ['.json'] },
+        },
+      ],
     };
     try {
       const handle = await window.showSaveFilePicker(options);
@@ -76,10 +78,10 @@
     } catch (e) {
       alert('保存をキャンセルしました。');
     }
-  }
-  const confirmSave = (e) => {
-    e.returnValue = '';
-  }
+  };
+  // const confirmSave = (e) => {
+  //   e.returnValue = '';
+  // }
   const scaleCardArea = () => {
     const content = document.querySelector('.content');
     if (content.classList.contains('zoom-out')) {
@@ -88,20 +90,20 @@
       content.classList.add('zoom-out');
       content.style.width = window.screen.width + 'px';
     }
-  }
+  };
   const addArchiveList = (e) => {
     this.archiveList.unshift(e);
-  }
+  };
   const deletedUpdate = (e) => {
     for (let i = 0; i < taskList.value.length; i++) {
       for (let j = 0; j < taskList.value[i].cardList.length; j++) {
         if (taskList.value[i].cardList[j].cardId === e) {
           taskList.value[i].cardList[j].deleted = true;
-          console.log(taskList.value)
+          console.log(taskList.value);
         }
       }
     }
-  }
+  };
 
   onMounted(() => {
     const viewport = document.querySelector('.viewport');
@@ -125,17 +127,17 @@
     if (typeof taskList.value === 'undefined') return;
     if (taskList.value.length > 0) {
       for (let i = 0; i < taskList.value.length; i++) {
-        console.log(taskList.value[i])
+        console.log(taskList.value[i]);
 
         if (taskList.value[i].cardList.length > 0) {
           for (let j = 0; j < taskList.value[i].cardList.length; j++) {
             if (taskList.value[i].cardList[j].archives) {
               archiveList.push({
-                'cardId': taskList.value[i].cardList[j].cardId,
-                'cardName': taskList.value[i].cardList[j].cardName,
-                'priority': taskList.value[i].cardList[j].priority,
-                'checked': taskList.value[i].cardList[j].checked,
-                'deleted': taskList.value[i].cardList[j].deleted,
+                cardId: taskList.value[i].cardList[j].cardId,
+                cardName: taskList.value[i].cardList[j].cardName,
+                priority: taskList.value[i].cardList[j].priority,
+                checked: taskList.value[i].cardList[j].checked,
+                deleted: taskList.value[i].cardList[j].deleted,
               });
             }
           }
@@ -144,7 +146,9 @@
     }
   });
   onBeforeRouteLeave((to, from, next) => {
-    const answer = window.confirm('保存していないデータは失われます。よろしいですか？');
+    const answer = window.confirm(
+      '保存していないデータは失われます。よろしいですか？'
+    );
     if (answer) {
       next();
     } else {
@@ -174,10 +178,8 @@
         </div>
         <div class="col-2">
           <q-btn :label="filtered ? 'filtered' : 'unfiltered'" class="full-width bg-light-blue-3"
-            @click="filtered = !filtered" size="15px" :icon="filtered? ic.filter.on: ic.filter.off">
-            <q-tooltip>
-              Remove uncleared
-            </q-tooltip>
+            @click="filtered = !filtered" size="15px" :icon="filtered ? ic.filter.on : ic.filter.off">
+            <q-tooltip> Remove uncleared </q-tooltip>
           </q-btn>
         </div>
         <q-btn dense flat class="text-white q-ml-auto" round icon="menu" @click="rightDrawerOpen = !rightDrawerOpen" />
@@ -185,7 +187,7 @@
     </q-header>
 
     <q-drawer v-model="rightDrawerOpen" side="right" overlay behavior="mobile" bordered>
-      <div class="column column-responsive-reverse menu-justify bg-blue-grey-1" style="height:100%;">
+      <div class="column column-responsive-reverse menu-justify bg-blue-grey-1" style="height: 100%">
         <div class="bottom-menu column column-responsive-reverse">
           <div class="close-btn">
             <div class="text-right q-px-md">
@@ -223,7 +225,9 @@
             </div>
           </div>
           <div v-else class="text-center">
-            <p class="text-h6 text-indigo-7"><span class="material-icons">search_off</span>No Archives…</p>
+            <p class="text-h6 text-indigo-7">
+              <span class="material-icons">search_off</span>No Archives…
+            </p>
           </div>
         </div>
       </div>
@@ -238,7 +242,7 @@
           <div>
             <div class="q-pa-sm w-300px" v-if="newSectionInput">
               <q-card class="my-card bg-blue-grey-1 q-pa-md">
-                <q-input borderless class="new-section" v-model="newSection" placeholder="sectionName" />
+                <q-input borderless class="new-section" v-model="sectionName" placeholder="sectionName" />
                 <q-btn flat label="cancel" color="primary" @click="newSectionInput = false" class="q-mt-sm" />
                 <q-btn push label="add" color="primary" @click="addSection" class="q-mt-sm" />
               </q-card>
@@ -259,18 +263,19 @@
       <q-tabs align="justify">
         <q-route-tab label="" dense icon="keyboard_return" to="/#" exact />
         <q-tab label="save" dense icon="save_alt" @click="saveData" />
-        <q-tab label="zoom" dense :icon="scaled? ic.zoom.in: ic.zoom.out" @click="
-        scaled = !scaled;scaleCardArea()" />
-        <q-tab label="filter" dense :icon="filtered? ic.filter.on: ic.filter.off" @click="filtered = !filtered" />
+        <q-tab label="zoom" dense :icon="scaled ? ic.zoom.in : ic.zoom.out" @click="
+            scaled = !scaled;
+            scaleCardArea();
+          " />
+        <q-tab label="filter" dense :icon="filtered ? ic.filter.on : ic.filter.off" @click="filtered = !filtered" />
         <q-tab label="menu" dense icon="menu" @click="rightDrawerOpen = !rightDrawerOpen" />
       </q-tabs>
     </footer>
-
   </q-page>
 </template>
 
 <style lang="scss" scoped>
-  @media screen and (max-width:1023px) {
+  @media screen and (max-width: 1023px) {
     .menu-justify {
       justify-content: space-between;
     }
@@ -283,7 +288,7 @@
   .task-container {
     height: calc(100vh - 72px);
 
-    @media screen and (min-width:1024px) {
+    @media screen and (min-width: 1024px) {
       height: calc(100vh - 65px);
     }
   }
@@ -298,7 +303,7 @@
     height: 100%;
     margin: auto;
 
-    @media screen and (max-width:599px) {
+    @media screen and (max-width: 599px) {
       display: flex;
       align-items: flex-end;
     }
@@ -320,9 +325,9 @@
   }
 
   .content {
-    transition: .3s;
+    transition: 0.3s;
 
-    @media screen and (max-width:599px) {
+    @media screen and (max-width: 599px) {
       align-items: flex-end;
     }
   }
@@ -338,7 +343,7 @@
     max-height: calc(100vh - 280px);
     overflow: auto;
 
-    @media screen and (max-width:599px) {
+    @media screen and (max-width: 599px) {
       max-height: calc(100vh - 160px);
     }
   }
