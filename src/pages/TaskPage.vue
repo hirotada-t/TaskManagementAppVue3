@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref, nextTick, provide } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 import TaskColumn from '../components/TaskColumn.vue';
 // import ArchiveItem from '../components/ArchiveItem.vue';
@@ -120,13 +120,6 @@ onMounted(() => {
     });
   }
 
-  // const taskListTitle = document.querySelector('.task-list-title');
-  // taskListTitle.addEventListener('keydown', (e) => {
-  //   if (e.key === 'Enter') {
-  //     this.saveData();
-  //   }
-  // });
-
   if (typeof taskList.value === 'undefined') return;
   if (taskList.value.length > 0) {
     for (let i = 0; i < taskList.value.length; i++) {
@@ -157,6 +150,7 @@ onBeforeRouteLeave((to, from, next) => {
     next(false);
   }
 });
+provide('filtered', filtered);
 </script>
 
 <template>
@@ -283,7 +277,6 @@ onBeforeRouteLeave((to, from, next) => {
           <div v-for="section of taskList" :key="section.sectionId">
             <TaskColumn
               :section="section"
-              :filtered="filtered"
               @add-archive-list="addArchiveList"
             ></TaskColumn>
           </div>

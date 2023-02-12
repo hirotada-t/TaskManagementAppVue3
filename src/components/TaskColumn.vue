@@ -4,8 +4,8 @@ import TaskItem from './TaskItem.vue';
 import { TaskList, ArchiveCard } from '../models';
 import { useQuasar } from 'quasar';
 
-const props = defineProps<{ section: TaskList; filtered: boolean }>();
-const emits = defineEmits(['add-archive-list']);
+const props = defineProps<{ section: TaskList}>();
+const emits = defineEmits<{ (e: 'add-archive-list', card: ArchiveCard): void }>();
 const getSection = ref<TaskList>(props.section);
 const newCard = ref<string>('');
 const newCardInput = ref<boolean>(false);
@@ -113,7 +113,6 @@ const countCards = () => {
         <div v-for="card of getSection.cardList" :key="card.cardId">
           <TaskItem
             :card="card"
-            :filtered="filtered"
             @add-archive="addArchive"
           ></TaskItem>
         </div>

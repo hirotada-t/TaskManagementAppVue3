@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Card } from '../models';
+import { ref, inject } from 'vue';
+import { ArchiveCard, Card } from '../models';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
-const props = defineProps<{ card: Card; filtered: boolean }>();
-const emits = defineEmits(['add-archive']);
+const props = defineProps<{ card: Card }>();
+const emits = defineEmits<{ (e: 'add-archive', card: ArchiveCard): void }>();
 
 const getCard = ref<Card>(props.card);
 const options = ['none', 'high', 'middle', 'low'];
-const getFiltered = ref<boolean>(props.filtered);
+const filtered = inject('filtered');
 
 const archiveCard = () => {
   let message = '';
@@ -36,16 +36,13 @@ const archiveCard = () => {
     });
   });
 };
-watch(getFiltered, (v) => {
-  getFiltered.value = v;
-});
 </script>
 
 <template>
   <q-card
     class="gnavi my-card q-mb-md"
     v-if="!getCard.archives"
-    v-show="getFiltered && getCard.cleared"
+    v-show="!(filtered && getCard.cleared)"
     :class="getCard.priority"
   >
     <div class="cleared-border" :class="getCard.cleared ? 'cleared' : ''">
