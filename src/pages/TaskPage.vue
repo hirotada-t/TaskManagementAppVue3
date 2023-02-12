@@ -2,7 +2,7 @@
 import { onMounted, ref, nextTick, provide } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 import TaskColumn from '../components/TaskColumn.vue';
-// import ArchiveItem from '../components/ArchiveItem.vue';
+import ArchiveItem from '../components/ArchiveItem.vue';
 import ScrollBooster from 'scrollbooster';
 import { TaskList, ArchiveCard } from '../models';
 import { exportFile, useQuasar } from 'quasar'
@@ -254,9 +254,9 @@ provide('filtered', filtered);
           <p class="text-h5 q-pt-md q-pl-md">Archive List</p>
           <div v-if="archiveList.length != 0">
             <div class="archive-area bg-blue-grey">
-              <div v-for="item of archiveList" :key="item.cardId">
+              <div v-for="archiveItem of archiveList" :key="archiveItem.cardId">
                 <ArchiveItem
-                  :archiveItem="item"
+                  :archiveItem="archiveItem"
                   @deleted-item="deletedUpdate"
                 ></ArchiveItem>
               </div>

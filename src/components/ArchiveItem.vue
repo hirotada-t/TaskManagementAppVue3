@@ -1,12 +1,35 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue';
+import { ArchiveCard } from '../models';
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
+const props = defineProps<{ archiveItem: ArchiveCard }>();
+const emits = defineEmits<{ (e: 'deleted-item', cardId: string): void }>();
+const archiveItem = ref(props.archiveItem);
+
+const deleteAlert = () => {
+  $q.dialog({
+    title: 'Alert',
+    message: 'Do you really want to delete it?',
+    cancel: {
+      push: true,
+      color: 'negative',
+    },
+  }).onOk(() => {
+    archiveItem.value.deleted = true;
+    emits('deleted-item', props.archiveItem.cardId);
+  });
+};
+</script>
 
 <template>
   <q-card
     class="gnavi my-card q-my-md q-mx-auto"
     :class="archiveItem.priority"
-    v-if="!deleted"
+    v-if="!archiveItem.deleted"
   >
-    <div class="cleared-border" :class="archiveItem.checked ? 'cleared' : ''">
+    <div class="cleared-border" :class="archiveItem.cleared ? 'cleared' : ''">
       <div>
         <q-card-section
           class="row justify-between q-py-none q-px-sm card-name text-h6"
@@ -18,16 +41,16 @@
           class="row justify-start items-center q-py-none q-px-sm card-name"
         >
           <div class="col-3">
-            <q-checkbox disable :value="archiveItem.checked" color="black" />
-            <q-tooltip v-if="archiveItem.checked"> Cleared! </q-tooltip>
-            <q-tooltip v-if="!archiveItem.checked"> Not cleared </q-tooltip>
+            <q-checkbox disable v-model="archiveItem.cleared" color="black" />
+            <q-tooltip v-if="archiveItem.cleared"> Cleared! </q-tooltip>
+            <q-tooltip v-if="!archiveItem.cleared"> Not cleared </q-tooltip>
           </div>
           <div class="col-6 q-py-sm">
             <q-input
               disable
               dense
               borderless
-              :value="archiveItem.priority"
+              v-model="archiveItem.priority"
               label="priority"
             />
           </div>
