@@ -29,7 +29,6 @@ const newSectionInput = ref<boolean>(false);
 const sectionName = ref<string>('');
 const filtered = ref<boolean>(false);
 const scaled = ref<boolean>(false);
-// const taskListTitle = '';
 const archiveList = ref<ArchiveCard[]>([]);
 
 const addSectionInput = () => {

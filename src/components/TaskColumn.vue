@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue';
 import TaskItem from './TaskItem.vue';
-import { TaskList, ArchiveCard } from '../models';
 import { useQuasar } from 'quasar';
+import { ArchiveCard, TaskList } from 'src/models';
 
 const props = defineProps<{ section: TaskList}>();
 const emits = defineEmits<{ (e: 'add-archive-list', card: ArchiveCard): void }>();

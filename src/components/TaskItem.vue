@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, inject } from 'vue';
-import { ArchiveCard, Card } from '../models';
 import { useQuasar } from 'quasar';
+import { ArchiveCard, Card } from 'src/models';
 
 const $q = useQuasar();
 const props = defineProps<{ card: Card }>();
