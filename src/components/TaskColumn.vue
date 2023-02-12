@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue';
-// import TaskItem from './TaskItem.vue';
+import TaskItem from './TaskItem.vue';
 import { TaskList, ArchiveCard } from '../models';
 import { useQuasar } from 'quasar';
 
-const props = defineProps<{ section: TaskList; filter: boolean }>();
-const emits = defineEmits(['add-archive-list']);
+const props = defineProps<{ section: TaskList}>();
+const emits = defineEmits<{ (e: 'add-archive-list', card: ArchiveCard): void }>();
 const getSection = ref<TaskList>(props.section);
 const newCard = ref<string>('');
 const newCardInput = ref<boolean>(false);
@@ -29,16 +29,10 @@ const addCard = () => {
   getSection.value.cardList.push({
     cardId: 'c-' + date.toLocaleString() + date.getMilliseconds(),
     cardName: newCard.value ? newCard.value : 'Card title',
-    // 'cardContent': 'content',
-    // 'createDate': date.toLocaleString(),
-    // 'deadLine': '',
-    // 'checkList': {},
-    // 'cardTags': [],
     priority: 'none',
-    checked: false,
+    cleared: false,
     archives: false,
     deleted: false,
-    // 'cardComment': 'comment',
   });
   newCard.value = '';
 };
@@ -58,15 +52,9 @@ const archiveSection = () => {
       emits('add-archive-list', {
         cardId: getSection.value.cardList[i].cardId,
         cardName: getSection.value.cardList[i].cardName,
-        // 'cardContent': 'content',
-        // 'createDate': date.toLocaleString(),
-        // 'deadLine': '',
-        // 'checkList': {},
-        // 'cardTags': [],
         priority: getSection.value.cardList[i].priority,
-        checked: getSection.value.cardList[i].checked,
+        cleared: getSection.value.cardList[i].cleared,
         deleted: false,
-        // 'cardComment': 'comment',
       });
     }
   });
@@ -125,7 +113,6 @@ const countCards = () => {
         <div v-for="card of getSection.cardList" :key="card.cardId">
           <TaskItem
             :card="card"
-            :filtered="filter"
             @add-archive="addArchive"
           ></TaskItem>
         </div>

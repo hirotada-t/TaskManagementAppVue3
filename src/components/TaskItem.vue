@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Card } from '../models';
+import { ref, inject } from 'vue';
+import { ArchiveCard, Card } from '../models';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
-const props = defineProps<{ card: Card; filtered: boolean }>();
-const emits = defineEmits(['add-archive']);
+const props = defineProps<{ card: Card }>();
+const emits = defineEmits<{ (e: 'add-archive', card: ArchiveCard): void }>();
 
-const getCard = ref(props.card);
+const getCard = ref<Card>(props.card);
 const options = ['none', 'high', 'middle', 'low'];
-const getFilter = ref(props.filtered);
+const filtered = inject('filtered');
 
 const archiveCard = () => {
   let message = '';
-  if (!getCard.value.checked) {
+  if (!getCard.value.cleared) {
     message = 'The task is uncompleted. Do you archive?';
   } else {
     message = 'Do you archive the task?';
@@ -30,32 +30,22 @@ const archiveCard = () => {
     emits('add-archive', {
       cardId: getCard.value.cardId,
       cardName: getCard.value.cardName,
-      // "cardPosNum": this.getSection.cardList.length + 1,
-      // "cardContent": "content",
-      // "createDate": date.toLocaleString(),
-      // "deadLine": "",
-      // "checkList": {},
-      // "cardTags": [],
       priority: getCard.value.priority,
-      checked: getCard.value.checked,
+      cleared: getCard.value.cleared,
       deleted: false,
-      // "cardComment": "comment",
     });
   });
 };
-watch(getFilter, (v) => {
-  getFilter.value = v;
-});
 </script>
 
 <template>
   <q-card
     class="gnavi my-card q-mb-md"
     v-if="!getCard.archives"
-    v-show="getFilter && getCard.checked"
+    v-show="!(filtered && getCard.cleared)"
     :class="getCard.priority"
   >
-    <div class="cleared-border" :class="getCard.checked ? 'cleared' : ''">
+    <div class="cleared-border" :class="getCard.cleared ? 'cleared' : ''">
       <div>
         <q-card-section class="q-py-none q-px-sm card-name">
           <q-input
@@ -75,13 +65,12 @@ watch(getFilter, (v) => {
               />
             </template>
           </q-input>
-          <!-- <span class="text-h6" @click="setDetails = true">{{getCard.cardName}}</span> -->
         </q-card-section>
         <q-card-section class="row justify-start q-py-none card-name">
           <div class="">
-            <q-checkbox v-model="getCard.checked" color="black" />
-            <q-tooltip v-if="getCard.checked"> Cleared! </q-tooltip>
-            <q-tooltip v-if="!getCard.checked"> Not cleared </q-tooltip>
+            <q-checkbox v-model="getCard.cleared" color="black" />
+            <q-tooltip v-if="getCard.cleared"> Cleared! </q-tooltip>
+            <q-tooltip v-if="!getCard.cleared"> Not cleared </q-tooltip>
           </div>
           <div class="">
             <q-btn round flat @click="archiveCard" icon="archive" />
