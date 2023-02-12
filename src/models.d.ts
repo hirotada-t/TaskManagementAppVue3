@@ -13,6 +13,6 @@ export interface ArchiveCard {
   cardId: string;
   cardName: string;
   priority: 'none' | 'high' | 'middle' | 'low';
-  checked: boolean;
+  cleared: boolean;
   deleted: boolean;
 }

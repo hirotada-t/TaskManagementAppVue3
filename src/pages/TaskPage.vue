@@ -138,7 +138,7 @@ onMounted(() => {
               cardId: taskList.value[i].cardList[j].cardId,
               cardName: taskList.value[i].cardList[j].cardName,
               priority: taskList.value[i].cardList[j].priority,
-              checked: taskList.value[i].cardList[j].checked,
+              cleared: taskList.value[i].cardList[j].cleared,
               deleted: taskList.value[i].cardList[j].deleted,
             });
           }
@@ -283,7 +283,7 @@ onBeforeRouteLeave((to, from, next) => {
           <div v-for="section of taskList" :key="section.sectionId">
             <TaskColumn
               :section="section"
-              :filter="filtered"
+              :filtered="filtered"
               @add-archive-list="addArchiveList"
             ></TaskColumn>
           </div>
