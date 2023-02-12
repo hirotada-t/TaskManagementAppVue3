@@ -5,7 +5,7 @@ import TaskColumn from '../components/TaskColumn.vue';
 import ArchiveItem from '../components/ArchiveItem.vue';
 import ScrollBooster from 'scrollbooster';
 import { TaskList, ArchiveCard } from '../models';
-import { exportFile, useQuasar } from 'quasar'
+import { exportFile, useQuasar } from 'quasar';
 
 const ic = {
   zoom: {
@@ -122,7 +122,6 @@ onMounted(() => {
   if (typeof taskList.value === 'undefined') return;
   if (taskList.value.length > 0) {
     for (let i = 0; i < taskList.value.length; i++) {
-
       if (taskList.value[i].cardList.length > 0) {
         for (let j = 0; j < taskList.value[i].cardList.length; j++) {
           if (taskList.value[i].cardList[j].archives) {
@@ -140,9 +139,7 @@ onMounted(() => {
   }
 });
 onBeforeRouteLeave((to, from, next) => {
-  const answer = window.confirm(
-    'Any unsaved data will be lost. Are you sure?'
-  );
+  const answer = window.confirm('Any unsaved data will be lost. Are you sure?');
   if (answer) {
     next();
   } else {
