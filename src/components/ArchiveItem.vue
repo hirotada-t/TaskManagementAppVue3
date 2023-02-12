@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ArchiveCard } from '../models';
 import { useQuasar } from 'quasar';
+import { ArchiveCard } from 'src/models';
 
 const $q = useQuasar();
 const props = defineProps<{ archiveItem: ArchiveCard }>();
