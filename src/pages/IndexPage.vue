@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import { paths } from '../router/routes';
 import { useQuasar } from 'quasar';
 import { TaskList } from 'src/models';
@@ -107,6 +107,11 @@ const alertWindow = (message: string) => {
     timeout: 3000,
   });
 };
+
+onBeforeRouteLeave((to, from, next) => {
+  localStorage.setItem('task', '[]');
+  next();
+});
 </script>
 
 <template>

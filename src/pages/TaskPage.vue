@@ -77,13 +77,7 @@ const saveData = async () => {
       icon: 'warning',
     });
   }
-  // const options = {
-  //   suggestedName: /*taskListTitle ? taskListTitle :*/ date.toLocaleString(),
-  // };
 };
-// const confirmSave = (e) => {
-//   e.returnValue = '';
-// }
 const scaleCardArea = () => {
   const content = document.querySelector('.content') as HTMLElement;
   if (content.classList.contains('zoom-out')) {
@@ -139,8 +133,13 @@ onMounted(() => {
   }
 });
 onBeforeRouteLeave((to, from, next) => {
+  if (localStorage.getItem('task') === '[]') {
+    next();
+    return;
+  }
   const answer = window.confirm('Any unsaved data will be lost. Are you sure?');
   if (answer) {
+    localStorage.clear()
     next();
   } else {
     next(false);
@@ -162,15 +161,6 @@ provide('filtered', filtered);
             to="/"
           />
         </div>
-        <!-- <div class="col-3 task-list-title">
-          <q-input dense outlined bg-color="grey-2" v-model="taskListTitle" placeholder="taskListTitle"
-            class="full-width" style="font-size: 25px;">
-            <template v-slot:append>
-              <q-icon v-if="taskListTitle === ''" name="edit" />
-              <q-icon v-else name="clear" class="cursor-pointer" @click="taskListTitle = ''" />
-            </template>
-          </q-input>
-        </div> -->
         <div class="col-2">
           <q-btn
             label="save"
