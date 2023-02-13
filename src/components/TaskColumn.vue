@@ -153,7 +153,7 @@ const countCards = () => {
   }
 
   margin-right: 5px;
-  max-height: calc(100vh - 290px);
+  max-height: calc(100vh - 350px);
   overflow-x: auto;
 }
 
