@@ -356,7 +356,7 @@ provide('filtered', filtered);
   }
 }
 .task-container {
-  height: calc(100vh - 200px);
+  height: calc(100vh - 150px);
   border-top: 1px #ccc dotted;
 
   @media screen and (min-width: 1024px) {
