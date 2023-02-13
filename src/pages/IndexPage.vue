@@ -109,7 +109,7 @@ const alertWindow = (message: string) => {
 };
 
 onBeforeRouteLeave((to, from, next) => {
-  localStorage.setItem('task', '[]');
+  if (!localStorage.getItem('task')) localStorage.setItem('task', '[]');
   next();
 });
 </script>
