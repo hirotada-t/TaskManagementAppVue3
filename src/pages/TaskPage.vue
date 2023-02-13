@@ -149,7 +149,7 @@ provide('filtered', filtered);
 </script>
 
 <template>
-  <q-page>
+  <q-page class="mobile-layout">
     <q-header elevated class="bg-grey-7 desktop-only text-black">
       <q-toolbar class="q-py-sm q-gutter-md">
         <div class="col-1">
@@ -308,7 +308,7 @@ provide('filtered', filtered);
       </div>
     </div>
 
-    <footer class="absolute-bottom bg-blue-grey-9 text-white mobile-only">
+    <footer class="bg-blue-grey-9 text-white mobile-only">
       <q-tabs align="justify">
         <q-route-tab label="" dense icon="keyboard_return" to="/#" exact />
         <q-tab label="save" dense icon="save_alt" @click="saveData" />
@@ -348,9 +348,16 @@ provide('filtered', filtered);
     flex-direction: column-reverse;
   }
 }
-
+.mobile-layout {
+  @media screen and (max-width: 599px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+  }
+}
 .task-container {
-  height: calc(100vh - 72px);
+  height: calc(100vh - 100px);
+  border-top: 1px #ccc dotted;
 
   @media screen and (min-width: 1024px) {
     height: calc(100vh - 65px);
