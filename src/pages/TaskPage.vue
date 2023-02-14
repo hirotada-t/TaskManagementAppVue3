@@ -135,14 +135,23 @@ onMounted(() => {
 onBeforeRouteLeave((to, from, next) => {
   if (localStorage.getItem('task') === '[]') {
     next();
-    return;
-  }
-  const answer = window.confirm('Any unsaved data will be lost. Are you sure?');
-  if (answer) {
-    localStorage.clear()
-    next();
   } else {
-    next(false);
+    $q.dialog({
+      message: 'Any unsaved data will be lost. Are you sure?',
+      persistent: true,
+      ok: true,
+      cancel: {
+        push: true,
+        color: 'negative',
+      },
+    })
+      .onOk(() => {
+        localStorage.clear();
+        next();
+      })
+      .onCancel(() => {
+        next(false);
+      });
   }
 });
 provide('filtered', filtered);
